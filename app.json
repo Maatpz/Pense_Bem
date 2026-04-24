@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Pense Bem Ze Carioca",
+    "slug": "pense-bem-ze-carioca",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/cover.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/cover.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#f6edd2"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/cover.png",
+        "backgroundColor": "#f6edd2"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/cover.png"
+    }
+  }
+}
