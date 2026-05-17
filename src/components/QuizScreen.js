@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 import QuestionCard from './QuestionCard';
 
@@ -31,6 +31,8 @@ export default function QuizScreen({
   score,
   totalQuestions,
 }) {
+  const { width } = useWindowDimensions();
+  const isNarrow = width < 520;
   const [selectedOption, setSelectedOption] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const [isLocked, setIsLocked] = useState(false);
@@ -45,6 +47,10 @@ export default function QuizScreen({
 
   const currentAttemptNumber = 4 - attemptsLeft;
   const progress = ((currentIndex + 1) / totalQuestions) * 100;
+  const lastQuestionNumber = program.questions[program.questions.length - 1]?.numero || totalQuestions;
+  const shouldShowLegend =
+    program.matchingLegend &&
+    currentQuestion.options.some((option) => Object.prototype.hasOwnProperty.call(program.matchingLegend, option));
 
   const handleSelectOption = (optionIndex) => {
     setSelectedOption(optionIndex);
@@ -80,26 +86,30 @@ export default function QuizScreen({
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.content} style={styles.container}>
+    <ScrollView contentContainerStyle={[styles.content, isNarrow && styles.contentNarrow]} style={styles.container}>
       <View style={styles.shell}>
-        <View style={styles.headerCard}>
-        <View style={styles.headerTopRow}>
-          <View>
+        <View style={[styles.headerCard, isNarrow && styles.headerCardNarrow]}>
+        <View style={[styles.headerTopRow, isNarrow && styles.headerTopRowNarrow]}>
+          <View style={styles.headerTextBlock}>
             <Text style={styles.headerTitle}>{program.title}</Text>
-            <Text style={styles.headerSubtitle}>
-              Pergunta {currentIndex + 1} de {totalQuestions}
+            <Text style={[styles.headerSubtitle, isNarrow && styles.headerSubtitleNarrow]}>
+              Pergunta {currentQuestion.numero} de {lastQuestionNumber}
             </Text>
           </View>
 
-          <View style={styles.headerRight}>
+          <View style={[styles.headerRight, isNarrow && styles.headerRightNarrow]}>
             <Pressable
               onPress={onRestart}
-              style={({ pressed }) => [styles.restartButton, pressed && styles.restartButtonPressed]}
+              style={({ pressed }) => [
+                styles.restartButton,
+                isNarrow && styles.restartButtonNarrow,
+                pressed && styles.restartButtonPressed,
+              ]}
             >
               <Text style={styles.restartButtonText}>Reiniciar game</Text>
             </Pressable>
 
-            <View style={styles.scorePill}>
+            <View style={[styles.scorePill, isNarrow && styles.scorePillNarrow]}>
               <Text style={styles.scoreLabel}>Pontuacao</Text>
               <Text style={styles.scoreValue}>{score}</Text>
             </View>
@@ -111,10 +121,10 @@ export default function QuizScreen({
         </View>
 
         <View style={styles.metaRow}>
-          <View style={styles.metaBadge}>
+          <View style={[styles.metaBadge, isNarrow && styles.metaBadgeNarrow]}>
             <Text style={styles.metaText}>Tentativas restantes: {attemptsLeft}</Text>
           </View>
-          <View style={styles.metaBadge}>
+          <View style={[styles.metaBadge, isNarrow && styles.metaBadgeNarrow]}>
             <Text style={styles.metaText}>Maximo: 90 pontos</Text>
           </View>
         </View>
@@ -129,14 +139,14 @@ export default function QuizScreen({
           selectedOption={selectedOption}
         />
 
-        {currentQuestion.numero >= 17 && currentQuestion.numero <= 21 ? (
+        {shouldShowLegend ? (
           <View style={styles.legendCard}>
             <Text style={styles.legendTitle}>Legenda da associacao</Text>
-            <Text style={styles.legendText}>A = 1954</Text>
-            <Text style={styles.legendText}>B = 1966</Text>
-            <Text style={styles.legendText}>C = 1958, 1962 e 1970</Text>
-            <Text style={styles.legendText}>D = 1934 e 1938</Text>
-            <Text style={styles.legendText}>E = 1930 e 1950</Text>
+            {Object.entries(program.matchingLegend).map(([key, value]) => (
+              <Text key={key} style={styles.legendText}>
+                {key} = {value}
+              </Text>
+            ))}
           </View>
         ) : null}
 
@@ -169,6 +179,9 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
   },
+  contentNarrow: {
+    padding: 12,
+  },
   shell: {
     width: '100%',
     maxWidth: Platform.OS === 'web' ? 1180 : '100%',
@@ -180,16 +193,33 @@ const styles = StyleSheet.create({
     backgroundColor: '#123c2e',
     gap: 16,
   },
+  headerCardNarrow: {
+    borderRadius: 18,
+    padding: 14,
+    gap: 12,
+  },
   headerTopRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     gap: 16,
   },
+  headerTopRowNarrow: {
+    flexDirection: 'column',
+    gap: 12,
+  },
+  headerTextBlock: {
+    flexShrink: 1,
+  },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+  },
+  headerRightNarrow: {
+    alignSelf: 'stretch',
+    justifyContent: 'space-between',
+    gap: 8,
   },
   headerTitle: {
     color: '#f4d157',
@@ -204,11 +234,22 @@ const styles = StyleSheet.create({
     fontSize: Platform.OS === 'web' ? 18 : 24,
     fontWeight: '800',
   },
+  headerSubtitleNarrow: {
+    fontSize: 20,
+  },
   restartButton: {
     borderRadius: 16,
     backgroundColor: '#fff4cf',
     paddingHorizontal: 16,
     paddingVertical: 12,
+  },
+  restartButtonNarrow: {
+    flex: 1,
+    minHeight: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
   },
   restartButtonPressed: {
     opacity: 0.88,
@@ -226,6 +267,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff4cf',
     paddingHorizontal: 14,
     paddingVertical: 10,
+  },
+  scorePillNarrow: {
+    minWidth: 78,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
   },
   scoreLabel: {
     color: '#7b5b0b',
@@ -258,6 +304,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.12)',
     paddingHorizontal: 12,
     paddingVertical: 8,
+  },
+  metaBadgeNarrow: {
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingHorizontal: 10,
   },
   metaText: {
     color: '#eaf1e8',
