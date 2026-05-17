@@ -1,4 +1,4 @@
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 const optionPalette = {
   0: {
@@ -51,13 +51,16 @@ export default function QuestionCard({
   revealedCorrectOption,
   selectedOption,
 }) {
+  const { width } = useWindowDimensions();
+  const isNarrow = width < 520;
+
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, isNarrow && styles.cardNarrow]}>
       <View style={styles.badge}>
         <Text style={styles.badgeText}>Pergunta {question.numero}</Text>
       </View>
 
-      <Text style={styles.questionText}>{question.question}</Text>
+      <Text style={[styles.questionText, isNarrow && styles.questionTextNarrow]}>{question.question}</Text>
 
       <View style={styles.optionsList}>
         {question.options.map((option, index) => {
@@ -79,6 +82,7 @@ export default function QuestionCard({
               onPress={() => onSelectOption(index)}
               style={({ pressed }) => [
                 styles.optionButton,
+                isNarrow && styles.optionButtonNarrow,
                 {
                   borderColor: palette.border,
                   backgroundColor: isSelected || isLocked ? palette.soft : '#fffef8',
@@ -98,7 +102,7 @@ export default function QuestionCard({
               >
                 {String.fromCharCode(65 + index)}
               </Text>
-              <Text style={styles.optionText}>{option}</Text>
+              <Text style={[styles.optionText, isNarrow && styles.optionTextNarrow]}>{option}</Text>
             </Pressable>
           );
         })}
@@ -125,6 +129,11 @@ const styles = StyleSheet.create({
     padding: Platform.OS === 'web' ? 18 : 20,
     gap: 18,
   },
+  cardNarrow: {
+    borderRadius: 18,
+    padding: 14,
+    gap: 14,
+  },
   badge: {
     alignSelf: 'flex-start',
     paddingHorizontal: 12,
@@ -143,6 +152,10 @@ const styles = StyleSheet.create({
     lineHeight: Platform.OS === 'web' ? 28 : 32,
     fontWeight: '800',
   },
+  questionTextNarrow: {
+    fontSize: 18,
+    lineHeight: 26,
+  },
   optionsList: {
     gap: 12,
   },
@@ -154,6 +167,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     paddingHorizontal: 14,
     paddingVertical: Platform.OS === 'web' ? 12 : 14,
+  },
+  optionButtonNarrow: {
+    borderRadius: 14,
+    gap: 10,
+    minHeight: 56,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
   },
   optionDefault: {},
   optionSelected: {
@@ -189,6 +209,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     fontWeight: '600',
+  },
+  optionTextNarrow: {
+    fontSize: 14,
+    lineHeight: 20,
   },
   answerBox: {
     borderRadius: 16,
