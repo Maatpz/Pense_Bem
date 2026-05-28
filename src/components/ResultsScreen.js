@@ -21,15 +21,15 @@ export default function ResultsScreen({ onRestart, program, score, stats }) {
 
         <View style={styles.grid}>
           <View style={styles.metricCard}>
-            <Text style={styles.metricLabel}>Acertos na 1a tentativa</Text>
+            <Text style={styles.metricLabel}>Acertos na 1° tentativa</Text>
             <Text style={styles.metricValue}>{stats.firstTry}</Text>
           </View>
           <View style={styles.metricCard}>
-            <Text style={styles.metricLabel}>Acertos na 2a tentativa</Text>
+            <Text style={styles.metricLabel}>Acertos na 2° tentativa</Text>
             <Text style={styles.metricValue}>{stats.secondTry}</Text>
           </View>
           <View style={styles.metricCard}>
-            <Text style={styles.metricLabel}>Acertos na 3a tentativa</Text>
+            <Text style={styles.metricLabel}>Acertos na 3° tentativa</Text>
             <Text style={styles.metricValue}>{stats.thirdTry}</Text>
           </View>
           <View style={styles.metricCard}>
